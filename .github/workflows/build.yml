@@ -15,7 +15,7 @@ jobs:
     name: Build new-api
     steps:
     
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
     
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
@@ -77,14 +77,14 @@ jobs:
             go build -ldflags "-s -w -X 'github.com/QuantumNous/new-api/common.Version=${{ steps.upstream.outputs.tag }}' -extldflags '-static'" -o new-api
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: new-api-freebsd
           path: |
               new-api/new-api
   
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
