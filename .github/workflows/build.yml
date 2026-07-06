@@ -42,19 +42,21 @@ jobs:
           CI: ""
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
-          cd new-api/web/default
-          bun install
+          cd new-api/web
+          bun install --frozen-lockfile
+          cd default
           DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION="${{ steps.upstream.outputs.tag }}" bun run build
-          cd ../../..
+          cd ../..
 
       - name: Build Frontend (classic)
         env:
           CI: ""
         run: |
-          cd new-api/web/classic
-          bun install
+          cd new-api/web
+          bun install --filter ./classic --frozen-lockfile
+          cd classic
           VITE_REACT_APP_VERSION="${{ steps.upstream.outputs.tag }}" bun run build
-          cd ../../..
+          cd ../..
 
       - name: Build Backend
         uses: vmactions/freebsd-vm@v1
