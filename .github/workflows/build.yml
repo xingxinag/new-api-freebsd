@@ -37,21 +37,31 @@ jobs:
         run: |
           git clone --depth 1 --branch "${{ steps.upstream.outputs.tag }}" "https://github.com/${UPSTREAM_REPO}.git" new-api
 
-      - name: Build Frontend (default)
+      - name: Build Frontend
         env:
           CI: ""
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
           cd new-api/web
-          bun install --frozen-lockfile
-          cd default
-          DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION="${{ steps.upstream.outputs.tag }}" bun run build
-          cd ../..
+          if [ -d default ]; then
+            bun install --frozen-lockfile
+            cd default
+            DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION="${{ steps.upstream.outputs.tag }}" bun run build
+            cd ../..
+          else
+            bun install --frozen-lockfile
+            DISABLE_ESLINT_PLUGIN='true' VITE_REACT_APP_VERSION="${{ steps.upstream.outputs.tag }}" bun run build
+            cd ..
+          fi
 
       - name: Build Frontend (classic)
         env:
           CI: ""
         run: |
+          if [ ! -d new-api/web/classic ]; then
+            echo "Skipping classic frontend build: new-api/web/classic does not exist"
+            exit 0
+          fi
           cd new-api/web
           bun install --filter ./classic --frozen-lockfile
           cd classic
